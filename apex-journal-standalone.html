@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>APEX Journal</title>
+<meta name="theme-color" content="#0E1116">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230E1116'/%3E%3Ctext x='50' y='70' font-size='58' font-family='monospace' font-weight='700' fill='%23E0A94E' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230E1116'/%3E%3Ctext x='50' y='70' font-size='58' font-family='monospace' font-weight='700' fill='%23E0A94E' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22APEX%20Journal%22%2C%22short_name%22%3A%22APEX%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230E1116%22%2C%22theme_color%22%3A%22%230E1116%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2527%2520viewBox%253D%25270%25200%2520100%2520100%2527%253E%253Crect%2520width%253D%2527100%2527%2520height%253D%2527100%2527%2520fill%253D%2527%25230E1116%2527%252F%253E%253Ctext%2520x%253D%252750%2527%2520y%253D%252770%2527%2520font-size%253D%252758%2527%2520font-family%253D%2527monospace%2527%2520fill%253D%2527%2523E0A94E%2527%2520text-anchor%253D%2527middle%2527%253EA%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<style>
+  :root{
+    --ink:#0E1116; --surface:#161B22; --surface2:#1C232D; --raise:#222B36;
+    --text:#E6E1D6; --muted:#8792A0; --faint:#5A6472;
+    --gold:#E0A94E; --profit:#3FB950; --loss:#F0564A; --border:#262D38;
+    --mono:"SF Mono",ui-monospace,"Roboto Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--ink);color:var(--text);font-family:var(--sans)}
+  body{padding:0 0 96px;max-width:520px;margin:0 auto;min-height:100vh}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+
+  header{position:sticky;top:0;z-index:20;background:rgba(14,17,22,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--border);
+    padding:14px 18px 12px;display:flex;align-items:baseline;justify-content:space-between}
+  header h1{margin:0;font-size:15px;font-weight:700;letter-spacing:.14em}
+  header h1 .g{color:var(--gold)}
+  header .sub{font-size:10.5px;color:var(--faint);letter-spacing:.1em;font-family:var(--mono)}
+
+  .tabs{display:flex;gap:0;position:sticky;top:53px;z-index:19;background:var(--ink);
+    border-bottom:1px solid var(--border)}
+  .tabs button{flex:1;background:none;border:none;color:var(--muted);
+    font-family:var(--sans);font-size:12.5px;font-weight:600;padding:13px 0;letter-spacing:.05em;
+    border-bottom:2px solid transparent;cursor:pointer}
+  .tabs button.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+  .page{padding:18px}
+  .hide{display:none}
+
+  .seg{display:flex;background:var(--surface);border:1px solid var(--border);
+    border-radius:11px;padding:3px;gap:3px;margin-bottom:16px}
+  .seg button{flex:1;background:none;border:none;color:var(--muted);padding:10px 0;
+    border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+  .seg button.buy.on{background:rgba(63,185,80,.16);color:var(--profit)}
+  .seg button.sell.on{background:rgba(240,86,74,.16);color:var(--loss)}
+  .seg.sym button.on{background:var(--raise);color:var(--gold)}
+
+  label.fl{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.09em;
+    text-transform:uppercase;margin:0 0 6px 2px;font-weight:600}
+  .field{margin-bottom:14px}
+  input,textarea{width:100%;background:var(--surface);border:1px solid var(--border);
+    border-radius:11px;color:var(--text);font-family:var(--mono);font-size:17px;
+    padding:13px 14px;outline:none;font-variant-numeric:tabular-nums}
+  input:focus,textarea:focus{border-color:var(--gold)}
+  textarea{font-family:var(--sans);font-size:14px;min-height:58px;resize:vertical}
+  .row{display:flex;gap:12px}
+  .row>.field{flex:1}
+  input.err{border-color:var(--loss)}
+
+  /* risk geometry bar */
+  .geo{margin:4px 0 18px;padding:16px 14px 12px;background:var(--surface);
+    border:1px solid var(--border);border-radius:14px}
+  .geo .track{position:relative;height:8px;border-radius:5px;background:var(--raise);margin:26px 0 8px}
+  .geo .fill{position:absolute;top:0;height:100%}
+  .geo .fill.r{background:linear-gradient(90deg,rgba(240,86,74,.35),var(--loss))}
+  .geo .fill.g{background:linear-gradient(90deg,var(--profit),rgba(63,185,80,.35))}
+  .geo .pin{position:absolute;top:-8px;width:2px;height:24px;background:var(--text)}
+  .geo .lab{position:absolute;top:-26px;font-family:var(--mono);font-size:10px;
+    transform:translateX(-50%);white-space:nowrap;color:var(--muted)}
+  .geo .lab b{display:block;color:var(--text);font-size:11px;text-align:center}
+  .geo .ends{display:flex;justify-content:space-between;font-family:var(--mono);
+    font-size:10px;color:var(--faint)}
+
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .m{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 14px}
+  .m.wide{grid-column:1/-1}
+  .m .k{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+  .m .v{font-family:var(--mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+  .m .u{font-size:12px;color:var(--faint);margin-left:3px;font-weight:400}
+  .v.pos{color:var(--profit)} .v.neg{color:var(--loss)} .v.gold{color:var(--gold)}
+
+  .warn{background:rgba(240,86,74,.1);border:1px solid rgba(240,86,74,.4);
+    color:#ff9a90;border-radius:11px;padding:11px 13px;font-size:12.5px;margin-bottom:14px;line-height:1.5}
+  .warn.ok{background:rgba(63,185,80,.09);border-color:rgba(63,185,80,.35);color:#8fe0a0}
+
+  .cta{width:100%;background:var(--gold);color:#1a1204;border:none;border-radius:13px;
+    padding:16px;font-family:var(--sans);font-size:15px;font-weight:800;letter-spacing:.03em;
+    cursor:pointer;margin-top:2px}
+  .cta:active{transform:translateY(1px)}
+  .cta.ghost{background:none;border:1px solid var(--border);color:var(--muted);font-weight:600}
+
+  /* history */
+  .trade{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:13px 15px;margin-bottom:11px}
+  .trade .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+  .trade .sym{font-weight:700;font-size:14px;letter-spacing:.03em}
+  .trade .dir{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:6px;margin-left:8px}
+  .dir.BUY{background:rgba(63,185,80,.15);color:var(--profit)}
+  .dir.SELL{background:rgba(240,86,74,.15);color:var(--loss)}
+  .badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.05em}
+  .badge.open{background:var(--raise);color:var(--muted)}
+  .badge.win{background:rgba(63,185,80,.18);color:var(--profit)}
+  .badge.loss{background:rgba(240,86,74,.18);color:var(--loss)}
+  .badge.be{background:rgba(224,169,78,.16);color:var(--gold)}
+  .trade .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-family:var(--mono);
+    font-size:11px;margin-bottom:10px}
+  .trade .grid .c .l{color:var(--faint);font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+  .trade .grid .c .d{color:var(--text);font-size:12.5px;margin-top:2px}
+  .trade .note{font-size:12px;color:var(--muted);line-height:1.5;margin:2px 0 10px;
+    padding-left:9px;border-left:2px solid var(--border)}
+  .acts{display:flex;gap:6px}
+  .acts button{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--muted);
+    border-radius:8px;padding:8px 0;font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+  .acts button.w.on{background:rgba(63,185,80,.2);color:var(--profit);border-color:transparent}
+  .acts button.l.on{background:rgba(240,86,74,.2);color:var(--loss);border-color:transparent}
+  .acts button.b.on{background:rgba(224,169,78,.2);color:var(--gold);border-color:transparent}
+  .acts button.del{flex:0 0 42px;color:var(--faint)}
+
+  .empty{text-align:center;color:var(--faint);padding:60px 20px;font-size:13px;line-height:1.7}
+
+  /* stats */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+  .sc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 15px}
+  .sc.wide{grid-column:1/-1}
+  .sc .k{font-size:10.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .sc .v{font-family:var(--mono);font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}
+  .sc .v small{font-size:14px;color:var(--faint)}
+  .bar{height:9px;border-radius:5px;background:var(--raise);overflow:hidden;display:flex;margin-top:12px}
+  .bar i{display:block;height:100%}
+
+  /* settings modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:none;
+    align-items:flex-end;justify-content:center}
+  .modal.on{display:flex}
+  .sheet{background:var(--surface);width:100%;max-width:520px;border-radius:20px 20px 0 0;
+    border-top:1px solid var(--border);padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
+  .sheet h3{margin:2px 0 4px;font-size:15px;letter-spacing:.04em}
+  .sheet p{margin:0 0 16px;font-size:12px;color:var(--muted);line-height:1.5}
+  .cfgrow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--border)}
+  .cfgrow .n{font-size:13px;font-weight:600}
+  .cfgrow .n span{display:block;font-size:10px;color:var(--faint);font-weight:400;margin-top:2px}
+  .cfgrow input{width:96px;font-size:14px;padding:9px 10px;text-align:right}
+  .gear{background:none;border:none;color:var(--muted);font-size:19px;cursor:pointer;padding:0 0 0 12px}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>APEX<span class="g">·</span>JOURNAL</h1>
+    <div class="sub" id="acctLine">— · risk 1%</div></div>
+  <button class="gear" onclick="openCfg()">⚙</button>
+</header>
+
+<div class="tabs">
+  <button class="on" data-tab="new" onclick="tab('new')">คำนวณ</button>
+  <button data-tab="hist" onclick="tab('hist')">ประวัติ</button>
+  <button data-tab="stat" onclick="tab('stat')">สถิติ</button>
+</div>
+
+<!-- ============ NEW / CALC ============ -->
+<div class="page" id="p-new">
+  <div class="seg sym" id="symSeg"></div>
+
+  <div class="seg">
+    <button class="buy on" id="bBuy" onclick="setDir('BUY')">BUY / LONG</button>
+    <button class="sell" id="bSell" onclick="setDir('SELL')">SELL / SHORT</button>
+  </div>
+
+  <div class="field">
+    <label class="fl">Entry — จุดเข้า</label>
+    <input id="fEntry" inputmode="decimal" placeholder="0.00" oninput="calc()">
+  </div>
+  <div class="row">
+    <div class="field">
+      <label class="fl">Stop Loss</label>
+      <input id="fSL" inputmode="decimal" placeholder="0.00" oninput="calc()">
+    </div>
+    <div class="field">
+      <label class="fl">Take Profit</label>
+      <input id="fTP" inputmode="decimal" placeholder="0.00" oninput="calc()">
+    </div>
+  </div>
+
+  <div class="geo" id="geo" style="display:none">
+    <div class="track">
+      <div class="fill r" id="gfR"></div>
+      <div class="fill g" id="gfG"></div>
+      <div class="pin" id="pSL"></div><div class="lab" id="lSL"></div>
+      <div class="pin" id="pEN"></div><div class="lab" id="lEN"></div>
+      <div class="pin" id="pTP"></div><div class="lab" id="lTP"></div>
+    </div>
+    <div class="ends"><span>ความเสี่ยง (SL)</span><span>กำไรเป้า (TP)</span></div>
+  </div>
+
+  <div id="warn"></div>
+
+  <div class="metrics">
+    <div class="m"><div class="k">R : R</div><div class="v gold num" id="oRR">—</div></div>
+    <div class="m"><div class="k">Lot แนะนำ</div><div class="v num" id="oLot">—</div></div>
+    <div class="m"><div class="k">ระยะ SL</div><div class="v num" id="oSLp">—<span class="u">pt</span></div></div>
+    <div class="m"><div class="k">ระยะ TP</div><div class="v num" id="oTPp">—<span class="u">pt</span></div></div>
+    <div class="m"><div class="k">เสี่ยง</div><div class="v neg num" id="oRisk">—</div></div>
+    <div class="m"><div class="k">กำไรเป้า</div><div class="v pos num" id="oRew">—</div></div>
+  </div>
+
+  <div class="field">
+    <label class="fl">Lot (แก้เองได้)</label>
+    <input id="fLot" inputmode="decimal" placeholder="auto" oninput="calc(true)">
+  </div>
+  <div class="field">
+    <label class="fl">โน้ต / เหตุผลเข้าเทรด (SMC, session…)</label>
+    <textarea id="fNote" placeholder="เช่น sweep liquidity + MSS + FVG retest, London session"></textarea>
+  </div>
+
+  <button class="cta" onclick="saveTrade()">บันทึกเทรด</button>
+</div>
+
+<!-- ============ HISTORY ============ -->
+<div class="page hide" id="p-hist">
+  <div id="histList"></div>
+</div>
+
+<!-- ============ STATS ============ -->
+<div class="page hide" id="p-stat">
+  <div id="statBody"></div>
+</div>
+
+<!-- ============ SETTINGS ============ -->
+<div class="modal" id="cfgModal" onclick="if(event.target===this)closeCfg()">
+  <div class="sheet">
+    <h3>ตั้งค่า</h3>
+    <p>ตรวจ contract size / point ให้ตรงกับ broker ของพี่ (ค่านี้ต่างกันแต่ละโบรก)</p>
+    <div class="cfgrow">
+      <div class="n">Account balance <span>ยอดพอร์ต (USD)</span></div>
+      <input id="cBal" inputmode="decimal" oninput="saveCfg()">
+    </div>
+    <div class="cfgrow">
+      <div class="n">Risk ต่อไม้ <span>% ของพอร์ต</span></div>
+      <input id="cRisk" inputmode="decimal" oninput="saveCfg()">
+    </div>
+    <div id="cfgSymbols"></div>
+    <button class="cta ghost" style="margin-top:16px" onclick="closeCfg()">เสร็จ</button>
+  </div>
+</div>
+
+<script>
+/* ---------- config & state ---------- */
+const DEFAULT_CFG = {
+  balance: 1000, risk: 1.0,
+  symbols: {
+    GOLD:    { contract: 100, point: 0.01, floor: 0   },
+    BITCOIN: { contract: 1,   point: 1.0,  floor: 200 }
+  }
+};
+let cfg = JSON.parse(JSON.stringify(DEFAULT_CFG));
+let trades = [];
+let dir = 'BUY';
+let sym = 'GOLD';
+let lotEdited = false;
+
+const $ = id => document.getElementById(id);
+const fmt = (n,d=2)=> (n==null||isNaN(n))?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const money = n => (n<0?'-':'')+'$'+fmt(Math.abs(n),2);
+
+/* ---------- persistence ---------- */
+function load(){
+  try{ const v=localStorage.getItem('apex_cfg'); if(v){cfg=Object.assign({},DEFAULT_CFG,JSON.parse(v)); cfg.symbols=Object.assign({},DEFAULT_CFG.symbols,cfg.symbols);} }catch(e){}
+  try{ const v=localStorage.getItem('apex_trades'); if(v) trades=JSON.parse(v); }catch(e){}
+  buildSymSeg(); buildCfgSymbols(); pushCfgToInputs(); renderAcct(); calc();
+}
+function persistTrades(){ try{ localStorage.setItem('apex_trades',JSON.stringify(trades)); }catch(e){ alert('บันทึกไม่สำเร็จ'); } }
+function persistCfg(){ try{ localStorage.setItem('apex_cfg',JSON.stringify(cfg)); }catch(e){} }
+
+/* ---------- UI build ---------- */
+function buildSymSeg(){
+  const el=$('symSeg'); el.innerHTML='';
+  Object.keys(cfg.symbols).forEach(s=>{
+    const b=document.createElement('button');
+    b.textContent=s; b.className=(s===sym?'on':'');
+    b.onclick=()=>{sym=s;buildSymSeg();renderAcct();calc();};
+    el.appendChild(b);
+  });
+}
+function renderAcct(){ $('acctLine').textContent = money(cfg.balance).replace('$','$')+' · '+sym+' · risk '+fmt(cfg.risk,1)+'%'; }
+function setDir(d){ dir=d; $('bBuy').classList.toggle('on',d==='BUY'); $('bSell').classList.toggle('on',d==='SELL'); calc(); }
+function tab(t){
+  ['new','hist','stat'].forEach(x=>{ $('p-'+x).classList.toggle('hide',x!==t);
+    document.querySelector(`[data-tab="${x}"]`).classList.toggle('on',x===t); });
+  if(t==='hist') renderHist();
+  if(t==='stat') renderStats();
+}
+
+/* ---------- settings ---------- */
+function openCfg(){ pushCfgToInputs(); $('cfgModal').classList.add('on'); }
+function closeCfg(){ $('cfgModal').classList.remove('on'); }
+function pushCfgToInputs(){ $('cBal').value=cfg.balance; $('cRisk').value=cfg.risk; buildCfgSymbols(); }
+function buildCfgSymbols(){
+  const host=$('cfgSymbols'); host.innerHTML='';
+  Object.entries(cfg.symbols).forEach(([s,v])=>{
+    ['contract|Contract size','point|Point size','floor|Broker floor (pt)'].forEach(pair=>{
+      const [key,lab]=pair.split('|');
+      const row=document.createElement('div'); row.className='cfgrow';
+      row.innerHTML=`<div class="n">${s} · ${lab.split(' ')[0]} <span>${lab}</span></div>`;
+      const inp=document.createElement('input'); inp.inputMode='decimal'; inp.value=v[key];
+      inp.oninput=()=>{ cfg.symbols[s][key]=parseFloat(inp.value)||0; persistCfg(); calc(); };
+      row.appendChild(inp); host.appendChild(row);
+    });
+  });
+}
+function saveCfg(){ cfg.balance=parseFloat($('cBal').value)||0; cfg.risk=parseFloat($('cRisk').value)||0; persistCfg(); renderAcct(); calc(); }
+
+/* ---------- core calculation ---------- */
+function readInputs(){
+  return { entry:parseFloat($('fEntry').value), sl:parseFloat($('fSL').value), tp:parseFloat($('fTP').value) };
+}
+function compute(){
+  const {entry,sl,tp}=readInputs();
+  const S=cfg.symbols[sym];
+  if(!(entry>0)||!(sl>0)) return null;
+  const dSL=Math.abs(entry-sl);
+  const dTP=(tp>0)?Math.abs(entry-tp):null;
+  const slPts=dSL/S.point;
+  const tpPts=dTP!=null?dTP/S.point:null;
+  const rr=(dTP!=null&&dSL>0)?dTP/dSL:null;
+  const riskPerLot=dSL*S.contract;                 // $ risk per 1 lot
+  const sugLot=riskPerLot>0?(cfg.balance*cfg.risk/100)/riskPerLot:null;
+  const manual=parseFloat($('fLot').value);
+  const lot=(lotEdited && manual>0)?manual:sugLot;
+  const riskMoney=lot!=null?dSL*S.contract*lot:null;
+  const rewMoney=(lot!=null&&dTP!=null)?dTP*S.contract*lot:null;
+  return {entry,sl,tp,dSL,dTP,slPts,tpPts,rr,sugLot,lot,riskMoney,rewMoney,S};
+}
+
+function calc(fromLot){
+  if(fromLot) lotEdited = ($('fLot').value.trim()!=='');
+  const c=compute();
+  const {entry,sl,tp}=readInputs();
+
+  // direction sanity highlighting
+  $('fSL').classList.remove('err'); $('fTP').classList.remove('err');
+  let warns=[];
+  if(entry>0&&sl>0){
+    const badSL = dir==='BUY'? sl>=entry : sl<=entry;
+    if(badSL){ $('fSL').classList.add('err');
+      warns.push(dir==='BUY'?'BUY: SL ควรอยู่ <b>ต่ำกว่า</b> Entry':'SELL: SL ควรอยู่ <b>สูงกว่า</b> Entry'); }
+  }
+  if(entry>0&&tp>0){
+    const badTP = dir==='BUY'? tp<=entry : tp>=entry;
+    if(badTP){ $('fTP').classList.add('err');
+      warns.push(dir==='BUY'?'BUY: TP ควรอยู่ <b>สูงกว่า</b> Entry':'SELL: TP ควรอยู่ <b>ต่ำกว่า</b> Entry'); }
+  }
+
+  if(!c){ $('geo').style.display='none'; ['oRR','oLot','oRisk','oRew'].forEach(i=>$(i).textContent='—');
+    $('oSLp').innerHTML='—<span class="u">pt</span>'; $('oTPp').innerHTML='—<span class="u">pt</span>';
+    renderWarn(warns); return; }
+
+  // broker floor
+  const floor=c.S.floor||0;
+  if(floor>0 && c.slPts<floor)
+    warns.push(`ระยะ SL = ${fmt(c.slPts,0)} pt น้อยกว่า broker floor (${floor} pt) — โบรกอาจไม่รับออเดอร์`);
+
+  // outputs
+  $('oRR').textContent   = c.rr!=null?fmt(c.rr,2):'—';
+  $('oRR').className='v gold num'+(c.rr!=null? (c.rr>=2?'':(c.rr<1?' neg':'')):'');
+  $('oLot').textContent  = c.sugLot!=null?fmt(c.sugLot,2):'—';
+  $('oSLp').innerHTML    = fmt(c.slPts,0)+'<span class="u">pt</span>';
+  $('oTPp').innerHTML    = (c.tpPts!=null?fmt(c.tpPts,0):'—')+'<span class="u">pt</span>';
+  $('oRisk').textContent = c.riskMoney!=null?money(-c.riskMoney):'—';
+  $('oRew').textContent  = c.rewMoney!=null?money(c.rewMoney):'—';
+  if(!lotEdited && c.sugLot!=null) $('fLot').placeholder=fmt(c.sugLot,2)+' (auto)';
+
+  drawGeo(c); renderWarn(warns);
+}
+
+function renderWarn(warns){
+  const el=$('warn');
+  if(!warns.length){ el.innerHTML=''; return; }
+  el.innerHTML='<div class="warn">'+warns.map(w=>'⚠ '+w).join('<br>')+'</div>';
+}
+
+function drawGeo(c){
+  if(c.dTP==null){ $('geo').style.display='none'; return; }
+  $('geo').style.display='block';
+  const lo=Math.min(c.sl,c.tp,c.entry), hi=Math.max(c.sl,c.tp,c.entry);
+  const span=(hi-lo)||1;
+  const pct=v=> ((v-lo)/span*100);
+  const eP=pct(c.entry), sP=pct(c.sl), tP=pct(c.tp);
+  // risk fill = between SL and entry ; reward fill = entry to TP
+  const rLo=Math.min(sP,eP), rHi=Math.max(sP,eP);
+  const gLo=Math.min(eP,tP), gHi=Math.max(eP,tP);
+  $('gfR').style.left=rLo+'%'; $('gfR').style.width=(rHi-rLo)+'%';
+  $('gfG').style.left=gLo+'%'; $('gfG').style.width=(gHi-gLo)+'%';
+  place('pSL','lSL',sP,'SL',c.sl);
+  place('pEN','lEN',eP,'ENTRY',c.entry);
+  place('pTP','lTP',tP,'TP',c.tp);
+}
+function place(pin,lab,p,name,val){
+  $(pin).style.left='calc('+p+'% - 1px)';
+  const L=$(lab); L.style.left=p+'%';
+  L.innerHTML=name+'<b>'+fmt(val,2)+'</b>';
+}
+
+/* ---------- save trade ---------- */
+async function saveTrade(){
+  const c=compute();
+  if(!c){ alert('กรอก Entry และ SL อย่างน้อย'); return; }
+  const t={
+    id:Date.now(), ts:new Date().toISOString(),
+    sym, dir, entry:c.entry, sl:c.sl, tp:c.tp||null,
+    lot:c.lot!=null?+c.lot.toFixed(2):null,
+    rr:c.rr!=null?+c.rr.toFixed(2):null,
+    slPts:Math.round(c.slPts), tpPts:c.tpPts!=null?Math.round(c.tpPts):null,
+    riskMoney:c.riskMoney!=null?+c.riskMoney.toFixed(2):null,
+    rewMoney:c.rewMoney!=null?+c.rewMoney.toFixed(2):null,
+    note:$('fNote').value.trim(), result:'open'
+  };
+  trades.unshift(t); await persistTrades();
+  ['fEntry','fSL','fTP','fLot','fNote'].forEach(i=>$(i).value='');
+  lotEdited=false; calc(); tab('hist');
+}
+
+/* ---------- history ---------- */
+function renderHist(){
+  const el=$('histList');
+  if(!trades.length){ el.innerHTML='<div class="empty">ยังไม่มีเทรดที่บันทึก<br>กรอกที่แท็บ “คำนวณ” แล้วกดบันทึก</div>'; return; }
+  el.innerHTML=trades.map(t=>{
+    const d=new Date(t.ts);
+    const date=d.toLocaleDateString('th-TH',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="trade">
+      <div class="top">
+        <div><span class="sym">${t.sym}</span><span class="dir ${t.dir}">${t.dir}</span></div>
+        <span class="badge ${t.result}">${({open:'OPEN',win:'WIN',loss:'LOSS',be:'BE'})[t.result]}</span>
+      </div>
+      <div class="grid">
+        <div class="c"><div class="l">Entry</div><div class="d">${fmt(t.entry,2)}</div></div>
+        <div class="c"><div class="l">SL</div><div class="d">${fmt(t.sl,2)}</div></div>
+        <div class="c"><div class="l">TP</div><div class="d">${t.tp?fmt(t.tp,2):'—'}</div></div>
+        <div class="c"><div class="l">R:R</div><div class="d">${t.rr!=null?fmt(t.rr,2):'—'}</div></div>
+        <div class="c"><div class="l">Lot</div><div class="d">${t.lot!=null?fmt(t.lot,2):'—'}</div></div>
+        <div class="c"><div class="l">Risk</div><div class="d">${t.riskMoney!=null?money(-t.riskMoney):'—'}</div></div>
+        <div class="c"><div class="l">Target</div><div class="d">${t.rewMoney!=null?money(t.rewMoney):'—'}</div></div>
+        <div class="c"><div class="l">Date</div><div class="d" style="font-size:10px">${date}</div></div>
+      </div>
+      ${t.note?`<div class="note">${t.note.replace(/</g,'&lt;')}</div>`:''}
+      <div class="acts">
+        <button class="w ${t.result==='win'?'on':''}" onclick="setResult(${t.id},'win')">Win</button>
+        <button class="l ${t.result==='loss'?'on':''}" onclick="setResult(${t.id},'loss')">Loss</button>
+        <button class="b ${t.result==='be'?'on':''}" onclick="setResult(${t.id},'be')">BE</button>
+        <button class="del" onclick="delTrade(${t.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function setResult(id,r){ const t=trades.find(x=>x.id===id); if(!t)return; t.result=(t.result===r?'open':r); await persistTrades(); renderHist(); }
+async function delTrade(id){ if(!confirm('ลบเทรดนี้?'))return; trades=trades.filter(x=>x.id!==id); await persistTrades(); renderHist(); }
+
+/* ---------- stats ---------- */
+function renderStats(){
+  const el=$('statBody');
+  const closed=trades.filter(t=>t.result!=='open');
+  const wins=closed.filter(t=>t.result==='win');
+  const losses=closed.filter(t=>t.result==='loss');
+  const be=closed.filter(t=>t.result==='be');
+  const decided=wins.length+losses.length;
+  const winRate=decided?wins.length/decided*100:0;
+  // R multiple: win=+rr(planned), loss=-1
+  let totalR=0; wins.forEach(t=>totalR+=(t.rr||0)); losses.forEach(()=>totalR-=1);
+  const grossW=wins.reduce((a,t)=>a+(t.rewMoney||0),0);
+  const grossL=losses.reduce((a,t)=>a+(t.riskMoney||0),0);
+  const pf=grossL>0?grossW/grossL:(grossW>0?Infinity:0);
+  const avgRR=trades.filter(t=>t.rr!=null).reduce((a,t,_,arr)=>a+t.rr/arr.length,0);
+  const net=grossW-grossL;
+
+  if(!trades.length){ el.innerHTML='<div class="empty">ยังไม่มีข้อมูลสถิติ</div>'; return; }
+  const wPct=decided?wins.length/decided*100:0, lPct=decided?losses.length/decided*100:0;
+  el.innerHTML=`
+    <div class="stat-grid">
+      <div class="sc"><div class="k">Win rate</div><div class="v">${fmt(winRate,0)}<small>%</small></div>
+        <div class="bar"><i style="width:${wPct}%;background:var(--profit)"></i><i style="width:${lPct}%;background:var(--loss)"></i></div></div>
+      <div class="sc"><div class="k">Total R</div><div class="v" style="color:${totalR>=0?'var(--profit)':'var(--loss)'}">${totalR>=0?'+':''}${fmt(totalR,1)}<small>R</small></div></div>
+      <div class="sc"><div class="k">Net P/L (ปิดแล้ว)</div><div class="v" style="color:${net>=0?'var(--profit)':'var(--loss)'}">${money(net)}</div></div>
+      <div class="sc"><div class="k">Profit factor</div><div class="v">${pf===Infinity?'∞':fmt(pf,2)}</div></div>
+      <div class="sc"><div class="k">เทรดทั้งหมด</div><div class="v">${trades.length}</div></div>
+      <div class="sc"><div class="k">avg R:R (แผน)</div><div class="v gold" style="color:var(--gold)">${fmt(avgRR,2)}</div></div>
+      <div class="sc wide"><div class="k">สรุปผล</div>
+        <div class="v" style="font-size:16px">
+          <span style="color:var(--profit)">${wins.length} W</span> ·
+          <span style="color:var(--loss)">${losses.length} L</span> ·
+          <span style="color:var(--gold)">${be.length} BE</span> ·
+          <span style="color:var(--muted)">${trades.filter(t=>t.result==='open').length} open</span>
+        </div></div>
+    </div>`;
+}
+
+load();
+</script>
+</body>
+</html>
